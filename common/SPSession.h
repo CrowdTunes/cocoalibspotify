@@ -228,6 +228,11 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 -(void)logout:(void (^)())completionBlock;
 
+
+// Generate a new track cache with only the tracks in keepTracks array
+// Helps to keep track cache memory low
+-(void)generateNewTrackCacheWith:(NSArray*)keepTracks;
+
 /** Returns the current connection state.
  
  Possible values: 

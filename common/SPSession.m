@@ -1026,6 +1026,16 @@ static SPSession *sharedSession;
     [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
+-(void)generateNewTrackCacheWith:(NSArray *)keepTracks {
+    SPDispatchAsync(^{
+        NSMutableDictionary* newCache = [NSMutableDictionary new];
+        for (SPTrack* track in keepTracks) {
+            [newCache setObject:track forKey:[NSValue valueWithPointer:track.track]];
+        }
+        self.trackCache = newCache;
+    });
+}
+
 -(void)logout:(void (^)())completionBlock {
 	[self.trackCache removeAllObjects];
 	[self.userCache removeAllObjects];
