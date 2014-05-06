@@ -577,7 +577,7 @@ static sp_session_callbacks _callbacks = {
 	.offline_error = &offline_error,
 	.credentials_blob_updated = &credentials_blob_updated,
 	.connectionstate_updated = &connectionstate_updated,
-#if TARGET_OS_IPHONE
+#if 0//TARGET_OS_IPHONE
 	.show_signup_page = &show_signup_page,
 	.show_signup_error_page = &show_signup_error_page,
 	.connect_to_facebook = &connect_to_facebook,
