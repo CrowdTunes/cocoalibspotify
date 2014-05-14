@@ -47,7 +47,7 @@ extern inline void SPDispatchSyncIfNeeded(dispatch_block_t block);
 
  @param block The block to execute.
  */
-extern inline void SPDispatchAsync(dispatch_block_t block);
+extern void SPDispatchAsync(dispatch_block_t block);
 
 /** Throw an assertion if the current execution is not on the libSpotify thread.
 
