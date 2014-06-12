@@ -300,7 +300,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -(BOOL)isEqual:(id)object{
     SPTrack *track = object;
     if ([track.name isEqual:self.name] && [track.consolidatedArtists isEqual:self.consolidatedArtists]){
-        NSLog(@"duplicate found");
+        //NSLog(@"duplicate found");
         return true;
     }
     return false;
