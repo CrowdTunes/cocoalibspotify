@@ -295,19 +295,5 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     session = nil;
 }
 
-//custom duplicate check
-
--(BOOL)isEqual:(id)object{
-    SPTrack *track = object;
-    if ([track.name isEqual:self.name] && [track.consolidatedArtists isEqual:self.consolidatedArtists]){
-        //NSLog(@"duplicate found");
-        return true;
-    }
-    return false;
-}
-
-- (NSUInteger)hash {
-    return [[NSString stringWithFormat:@"%@%@",self.name,self.consolidatedArtists] hash];
-}
 
 @end
