@@ -49,20 +49,26 @@ static NSMutableArray *observerCache;
 
 +(void)waitUntilLoaded:(id)itemOrItems timeout:(NSTimeInterval)timeout then:(void (^)(NSArray *, NSArray *))block {
 	
-	NSArray *itemArray = [itemOrItems isKindOfClass:[NSArray class]] ? itemOrItems : [NSArray arrayWithObject:itemOrItems];
-	
-	SPAsyncLoading *observer = [[SPAsyncLoading alloc] initWithItems:itemArray
-															 timeout:timeout
-														 loadedBlock:block];
-	
-	if (observer) {
-		if (observerCache == nil) observerCache = [[NSMutableArray alloc] init];
-		
-		@synchronized(observerCache) {
-			[observerCache addObject:observer];
-		}
-	}
-	
+    if (itemOrItems) {
+        // this will always creash if the object passed in is NIL... that is bad,
+        NSArray *itemArray = [itemOrItems isKindOfClass:[NSArray class]] ? itemOrItems : [NSArray arrayWithObject:itemOrItems];
+        
+        SPAsyncLoading *observer = [[SPAsyncLoading alloc] initWithItems:itemArray
+                                                                 timeout:timeout
+                                                             loadedBlock:block];
+        
+        if (observer) {
+            if (observerCache == nil) observerCache = [[NSMutableArray alloc] init];
+            
+            @synchronized(observerCache) {
+                [observerCache addObject:observer];
+            }
+        }
+    }
+    else {
+        // passed in object was nil, just return immediately
+        block(nil,nil);
+    }
 }
 
 -(id)initWithItems:(NSArray *)items loadedBlock:(void (^)(NSArray *))block {
