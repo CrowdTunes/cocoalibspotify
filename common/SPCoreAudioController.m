@@ -267,7 +267,7 @@ static NSTimeInterval const kTargetBufferLength = 0.5;
 #if TARGET_OS_IPHONE
 	NSError *error = nil;
 	BOOL success = YES;
-	success &= [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
+	success &= [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryMultiRoute error:&error];
 	success &= [[AVAudioSession sharedInstance] setActive:YES error:&error];
 	
 	if (!success && err != NULL) {
