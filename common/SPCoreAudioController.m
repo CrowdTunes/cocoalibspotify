@@ -77,7 +77,8 @@ static NSTimeInterval const kTargetBufferLength = 0.5;
 		
 		[self addObserver:self forKeyPath:@"volume" options:0 context:nil];
 		[self addObserver:self forKeyPath:@"audioOutputEnabled" options:0 context:nil];
-		
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(routeChange:) name:AVAudioSessionRouteChangeNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(servicesReset:) name:AVAudioSessionMediaServicesWereResetNotification object:nil];
 	}
 	return self;
 }
@@ -260,6 +261,10 @@ static NSTimeInterval const kTargetBufferLength = 0.5;
 }
 
 -(BOOL)setupCoreAudioWithInputFormat:(AudioStreamBasicDescription)inputFormat error:(NSError **)err {
+    return [self setupCoreAudioWithInputFormat:inputFormat routeCategory:AVAudioSessionCategoryMultiRoute error:err];
+}
+
+-(BOOL)setupCoreAudioWithInputFormat:(AudioStreamBasicDescription)inputFormat routeCategory:(NSString*)category error:(NSError **)err {
     
     if (audioProcessingGraph != NULL)
         [self teardownCoreAudio];
@@ -267,11 +272,12 @@ static NSTimeInterval const kTargetBufferLength = 0.5;
 #if TARGET_OS_IPHONE
 	NSError *error = nil;
 	BOOL success = YES;
-	success &= [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryMultiRoute error:&error];
+	success &= [[AVAudioSession sharedInstance] setCategory:category error:&error];
 	success &= [[AVAudioSession sharedInstance] setActive:YES error:&error];
 	
 	if (!success && err != NULL) {
 		*err = error;
+        NSLog(@"failed to create audio session with error %@", error);
 		return NO;
 	}
 #endif
@@ -501,6 +507,55 @@ static OSStatus AudioUnitRenderDelegateCallback(void *inRefCon,
 
 -(void)incrementTrackPositionWithFrameCount:(UInt32)framesToAppend {
 	[self.delegate coreAudioController:self didOutputAudioOfDuration:framesToAppend/self.inputAudioDescription.mSampleRate];
+}
+
+- (void)servicesReset:(NSNotification*)notification {
+    //media server crashed, saw this with an LG tv that would not recognize 2 devices for multiroute
+    //just switch the session back to playback from multiroute
+   [self setupCoreAudioWithInputFormat:self.inputAudioDescription routeCategory:AVAudioSessionCategoryPlayback error:nil];
+}
+
+- (void)routeChange:(NSNotification*)notification {
+    
+    NSDictionary *interuptionDict = notification.userInfo;
+    
+    NSInteger routeChangeReason = [[interuptionDict valueForKey:AVAudioSessionRouteChangeReasonKey] integerValue];
+    switch (routeChangeReason) {
+        case AVAudioSessionRouteChangeReasonUnknown:
+            //NSLog(@"routeChangeReason : AVAudioSessionRouteChangeReasonUnknown");
+            break;
+            
+        case AVAudioSessionRouteChangeReasonNewDeviceAvailable:
+            // a headset was added or removed
+            // we should check to see if hdmi and headphones are present, and use multiroute if so
+            //NSLog(@"routeChangeReason : AVAudioSessionRouteChangeReasonNewDeviceAvailable");
+            break;
+            
+        case AVAudioSessionRouteChangeReasonOldDeviceUnavailable:
+            // a headset was added or removed
+            //NSLog(@"routeChangeReason : AVAudioSessionRouteChangeReasonOldDeviceUnavailable");
+            break;
+            
+        case AVAudioSessionRouteChangeReasonCategoryChange:
+            // called at start - also when other audio wants to play
+            //NSLog(@"routeChangeReason : AVAudioSessionRouteChangeReasonCategoryChange");//AVAudioSessionRouteChangeReasonCategoryChange
+            break;
+            
+        case AVAudioSessionRouteChangeReasonOverride:
+            //NSLog(@"routeChangeReason : AVAudioSessionRouteChangeReasonOverride");
+            break;
+            
+        case AVAudioSessionRouteChangeReasonWakeFromSleep:
+           //NSLog(@"routeChangeReason : AVAudioSessionRouteChangeReasonWakeFromSleep");
+            break;
+            
+        case AVAudioSessionRouteChangeReasonNoSuitableRouteForCategory:
+            //NSLog(@"routeChangeReason : AVAudioSessionRouteChangeReasonNoSuitableRouteForCategory");
+            break;
+            
+        default:
+            break;
+    }
 }
 
 @end
