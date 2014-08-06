@@ -167,7 +167,7 @@ static NSTimeInterval const kTargetBufferLength = 0.5;
 										 kMultiChannelMixerParam_Volume,
 										 kAudioUnitScope_Output, 
 										 0,
-										 vol * vol * vol,
+										 vol,
 										 0);
 	
 	if (status != noErr) {
