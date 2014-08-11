@@ -261,7 +261,13 @@ static NSTimeInterval const kTargetBufferLength = 0.5;
 }
 
 -(BOOL)setupCoreAudioWithInputFormat:(AudioStreamBasicDescription)inputFormat error:(NSError **)err {
-    return [self setupCoreAudioWithInputFormat:inputFormat routeCategory:AVAudioSessionCategoryMultiRoute error:err];
+    //check if the user has disabled multiroute
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"multirouteDisabled"]){
+        return [self setupCoreAudioWithInputFormat:inputFormat routeCategory:AVAudioSessionCategoryPlayback error:err];
+    }
+    else{
+        return [self setupCoreAudioWithInputFormat:inputFormat routeCategory:AVAudioSessionCategoryMultiRoute error:err];
+    }
 }
 
 -(BOOL)setupCoreAudioWithInputFormat:(AudioStreamBasicDescription)inputFormat routeCategory:(NSString*)category error:(NSError **)err {
