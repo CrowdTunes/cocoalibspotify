@@ -152,20 +152,22 @@ static NSMutableDictionary *albumCache;
 	BOOL newAvailable = sp_album_is_available(self.album);
 	BOOL newLoaded = sp_album_is_loaded(self.album);
 	
-	const byte *imageId = sp_album_cover(self.album, SP_IMAGE_SIZE_NORMAL);
-	
-	if (imageId != NULL)
-		newCover = [SPImage imageWithImageId:imageId inSession:self.session];
+// Loading all the images takes a lot of memory over time.  We don't need it that bad.
 
-	const byte *smallImageId = sp_album_cover(self.album, SP_IMAGE_SIZE_SMALL);
-	
-	if (smallImageId != NULL)
-		newSmallCover = [SPImage imageWithImageId:smallImageId inSession:self.session];
-
-	const byte *largeImageId = sp_album_cover(self.album, SP_IMAGE_SIZE_LARGE);
-	
-	if (largeImageId != NULL)
-		newLargeCover = [SPImage imageWithImageId:largeImageId inSession:self.session];
+//	const byte *imageId = sp_album_cover(self.album, SP_IMAGE_SIZE_NORMAL);
+//	
+//	if (imageId != NULL)
+//		newCover = [SPImage imageWithImageId:imageId inSession:self.session];
+//
+//	const byte *smallImageId = sp_album_cover(self.album, SP_IMAGE_SIZE_SMALL);
+//	
+//	if (smallImageId != NULL)
+//		newSmallCover = [SPImage imageWithImageId:smallImageId inSession:self.session];
+//
+//	const byte *largeImageId = sp_album_cover(self.album, SP_IMAGE_SIZE_LARGE);
+//	
+//	if (largeImageId != NULL)
+//		newLargeCover = [SPImage imageWithImageId:largeImageId inSession:self.session];
 	
 	sp_artist *spArtist = sp_album_artist(self.album);
 	if (spArtist != NULL)

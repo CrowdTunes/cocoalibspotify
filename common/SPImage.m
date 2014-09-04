@@ -34,6 +34,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #import "SPSession.h"
 #import "SPURLExtensions.h"
 
+#define IMAGE_CACHE_LIMIT (100)
+
 @interface SPImageCallbackProxy : NSObject
 // SPImageCallbackProxy is here to bridge the gap between -dealloc and the 
 // playlist callbacks being unregistered, since that's done async.
@@ -89,9 +91,14 @@ static void image_loaded(sp_image *image, void *userdata) {
 static NSMutableDictionary *imageCache;
 
 +(SPImage *)imageWithImageId:(const byte *)imageId inSession:(SPSession *)aSession {
-
+    
 	SPAssertOnLibSpotifyThread();
 	
+    // Prevent image cache from growing endlessly
+    if (imageCache.count > IMAGE_CACHE_LIMIT) {
+        imageCache = nil;
+    }
+
     if (imageCache == nil) {
         imageCache = [[NSMutableDictionary alloc] init];
     }
@@ -110,6 +117,14 @@ static NSMutableDictionary *imageCache;
 											   imageId:imageId
 											 inSession:aSession];
 	[imageCache setObject:cachedImage forKey:imageIdAsData];
+    
+//    float cumulativeMem = 0;
+//    for (NSData* key in [imageCache allKeys]) {
+//        UIImage* image = [(SPImage*)[imageCache objectForKey:key] image];
+//        cumulativeMem += image.size.width*image.size.height*image.scale*4;
+//        
+//    }
+//    NSLog(@"total images: %d  estimated memory: %f MB", imageCache.count, cumulativeMem/1024.f/1024.f);
 	return cachedImage;
 }
 
