@@ -171,9 +171,10 @@ static NSMutableDictionary *imageCache;
 			self.callbackProxy = [[SPImageCallbackProxy alloc] init];
 			self.callbackProxy.image = self;
 			
-			sp_image_add_load_callback(self.spImage,
-									   &image_loaded,
-									   (__bridge void *)(self.callbackProxy));
+            // don't load them by default...
+//			sp_image_add_load_callback(self.spImage,
+//									   &image_loaded,
+//									   (__bridge void *)(self.callbackProxy));
 			
 			BOOL isLoaded = sp_image_is_loaded(self.spImage);
 			SPPlatformNativeImage *im = nil;
