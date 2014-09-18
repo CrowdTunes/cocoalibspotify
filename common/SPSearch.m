@@ -190,8 +190,8 @@ void search_complete(sp_search *result, void *userdata) {
 		
 		if ((self = [self initWithSession:aSession])) {
 			
-			requestedAlbumResults = size;
-			requestedArtistResults = size;
+			requestedAlbumResults = 0;
+			requestedArtistResults = 0;
 			requestedTrackResults = size;
 			pageSize = size;
 			self.searchQuery = searchString;
