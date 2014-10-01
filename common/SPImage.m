@@ -34,7 +34,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #import "SPSession.h"
 #import "SPURLExtensions.h"
 
-#define IMAGE_CACHE_LIMIT (100)
+#define CACHE_LIMIT 100
 
 @interface SPImageCallbackProxy : NSObject
 // SPImageCallbackProxy is here to bridge the gap between -dealloc and the 
@@ -95,7 +95,8 @@ static NSMutableDictionary *imageCache;
 	SPAssertOnLibSpotifyThread();
 	
     // Prevent image cache from growing endlessly
-    if (imageCache.count > IMAGE_CACHE_LIMIT) {
+    if (imageCache.count > CACHE_LIMIT) {
+        [imageCache removeAllObjects];
         imageCache = nil;
     }
 

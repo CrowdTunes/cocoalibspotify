@@ -37,6 +37,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #import "SPURLExtensions.h"
 #import "SPSessionInternal.h"
 
+#define CACHE_LIMIT 100
+
 @interface SPAlbum ()
 
 @property (nonatomic, readwrite) sp_album *album;
@@ -65,6 +67,11 @@ static NSMutableDictionary *albumCache;
     
 	SPAssertOnLibSpotifyThread();
 	
+    if (albumCache.count > CACHE_LIMIT) {
+        [albumCache removeAllObjects];
+        albumCache = nil;
+    }
+    
     if (albumCache == nil) {
         albumCache = [[NSMutableDictionary alloc] init];
     }

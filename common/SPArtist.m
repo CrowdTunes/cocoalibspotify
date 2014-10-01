@@ -35,6 +35,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #import "SPSession.h"
 #import "SPSessionInternal.h"
 
+#define CACHE_LIMIT 100
+
 @interface SPArtist ()
 
 -(BOOL)checkLoaded;
@@ -54,6 +56,11 @@ static NSMutableDictionary *artistCache;
     
 	SPAssertOnLibSpotifyThread();
 	
+    if (artistCache.count > CACHE_LIMIT) {
+        [artistCache removeAllObjects];
+        artistCache = nil;
+    }
+    
     if (artistCache == nil) {
         artistCache = [[NSMutableDictionary alloc] init];
     }
