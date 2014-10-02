@@ -34,8 +34,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #import "SPSession.h"
 #import "SPURLExtensions.h"
 
-#define CACHE_LIMIT 100
-
 @interface SPImageCallbackProxy : NSObject
 // SPImageCallbackProxy is here to bridge the gap between -dealloc and the 
 // playlist callbacks being unregistered, since that's done async.
@@ -152,6 +150,13 @@ static NSMutableDictionary *imageCache;
 		
 		if (block) dispatch_async(dispatch_get_main_queue(), ^() { block(spImage); });
 	});
+}
+
++(void)clearCache {
+    SPDispatchAsync(^{
+        [imageCache removeAllObjects];
+        imageCache = [NSMutableDictionary new];
+    });
 }
 
 #pragma mark -

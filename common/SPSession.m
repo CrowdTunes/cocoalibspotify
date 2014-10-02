@@ -51,8 +51,6 @@
 #import "SPUnknownPlaylist.h"
 #import "SPSessionInternal.h"
 
-#define CACHE_LIMIT 100
-
 @interface NSObject (SPLoadedObject)
 -(BOOL)checkLoaded;
 @end
@@ -922,6 +920,16 @@ static SPSession *sharedSession;
 			if (completionBlock) completionBlock();
 		});
 	});
+}
+
++(void)clearCache {
+    SPDispatchAsync(^{
+        SPSession* session = [SPSession sharedSession];
+        if (session) {
+            [session.trackCache removeAllObjects];
+            session.trackCache = [NSMutableDictionary new];
+        }
+    });
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {

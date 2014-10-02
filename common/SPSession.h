@@ -33,6 +33,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #import <Foundation/Foundation.h>
 #import "CocoaLibSpotifyPlatformImports.h"
 
+#define CACHE_LIMIT 100      // max items allowed in our caches, above which results in flush
+
 @class SPPlaylist;
 @class SPPlaylistFolder;
 @class SPPlaylistContainer;
@@ -128,6 +130,10 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  successfully called.
  */
 +(SPSession *)sharedSession;
+
+/** Clears out the Track Cache
+ */
++(void)clearCache;
 
 /** Initializes the shared SPSession object.
 

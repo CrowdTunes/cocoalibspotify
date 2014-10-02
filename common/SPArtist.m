@@ -35,8 +35,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #import "SPSession.h"
 #import "SPSessionInternal.h"
 
-#define CACHE_LIMIT 100
-
 @interface SPArtist ()
 
 -(BOOL)checkLoaded;
@@ -97,6 +95,13 @@ static NSMutableDictionary *artistCache;
 		}
 		if (block) dispatch_async(dispatch_get_main_queue(), ^() { block(newArtist); });
 	});
+}
+
++(void)clearCache {
+    SPDispatchAsync(^{
+        [artistCache removeAllObjects];
+        artistCache = [NSMutableDictionary new];
+    });
 }
 
 #pragma mark -

@@ -76,6 +76,10 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 +(void)albumWithAlbumURL:(NSURL *)aURL inSession:(SPSession *)aSession callback:(void (^)(SPAlbum *album))block;
 
+/** Clears out the internal album cache.  Use in a pinch
+ */
++(void)clearCache;
+
 /** Initializes a new SPAlbum from the given opaque sp_album struct. 
  
  @warning This method *must* be called on the libSpotify thread. See the
@@ -95,7 +99,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// @name Properties
 ///----------------------------
 
-/** Returns the opaque structure used by the C LibSpotify API. 
+/** Returns the opaque structure used by the C LibSpotify API.
  
  @warning This method *must* be called on the libSpotify thread. See the
  "Threading" section of the library's readme for more information.

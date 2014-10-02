@@ -37,8 +37,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #import "SPURLExtensions.h"
 #import "SPSessionInternal.h"
 
-#define CACHE_LIMIT 100
-
 @interface SPAlbum ()
 
 @property (nonatomic, readwrite) sp_album *album;
@@ -108,6 +106,13 @@ static NSMutableDictionary *albumCache;
 		}
 		if (block) dispatch_async(dispatch_get_main_queue(), ^() { block(newAlbum); });
 	});
+}
+
++(void)clearCache {
+    SPDispatchAsync(^{
+        [albumCache removeAllObjects];
+        albumCache = [NSMutableDictionary new];
+    });
 }
 
 -(id)initWithAlbumStruct:(sp_album *)anAlbum inSession:(SPSession *)aSession {
