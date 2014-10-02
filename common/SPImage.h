@@ -70,10 +70,6 @@ static NSUInteger const SPImageIdLength = 20;
  */
 +(void)imageWithImageURL:(NSURL *)imageURL inSession:(SPSession *)aSession callback:(void (^)(SPImage *image))block;
 
-/** Clears out the Cache
- */
-+(void)clearCache;
-
 /** Initializes a new SPImage from the given struct and ID. 
  
  @warning This method *must* be called on the libSpotify thread. See the

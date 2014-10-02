@@ -922,16 +922,6 @@ static SPSession *sharedSession;
 	});
 }
 
-+(void)clearCache {
-    SPDispatchAsync(^{
-        SPSession* session = [SPSession sharedSession];
-        if (session) {
-            [session.trackCache removeAllObjects];
-            session.trackCache = [NSMutableDictionary new];
-        }
-    });
-}
-
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     if (context == (__bridge void *)kSPSessionKVOContext) {
 		
@@ -1194,31 +1184,9 @@ static SPSession *sharedSession;
 	
 	if (spTrack == NULL)
 		return nil;
-    
-    // keep our track cache in check
-    if (trackCache.count > CACHE_LIMIT) {
-        [trackCache removeAllObjects];
-        trackCache = nil;
-    }
-    
-    if (trackCache == nil) {
-        trackCache = [NSMutableDictionary new];
-    }
 
-	NSValue *ptrValue = [NSValue valueWithPointer:spTrack];
-	SPTrack *cachedTrack = [self.trackCache objectForKey:ptrValue];
-	
-    if (cachedTrack != nil) {
-        // track may have been cached without album browse specific fields
-        [cachedTrack updateAlbumBrowseSpecificMembers];
-        return cachedTrack;
-    }
-    
-	cachedTrack = [[SPTrack alloc] initWithTrackStruct:spTrack
-											 inSession:self];
-	
-    [self.trackCache setObject:cachedTrack forKey:ptrValue];
-    return cachedTrack;
+    return [[SPTrack alloc] initWithTrackStruct:spTrack
+                                      inSession:self];
 }
 
 -(SPUser *)userForUserStruct:(sp_user *)spUser {

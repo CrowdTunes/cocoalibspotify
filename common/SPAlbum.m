@@ -64,27 +64,8 @@ static NSMutableDictionary *albumCache;
 +(SPAlbum *)albumWithAlbumStruct:(sp_album *)anAlbum inSession:(SPSession *)aSession {
     
 	SPAssertOnLibSpotifyThread();
-	
-    if (albumCache.count > CACHE_LIMIT) {
-        [albumCache removeAllObjects];
-        albumCache = nil;
-    }
-    
-    if (albumCache == nil) {
-        albumCache = [[NSMutableDictionary alloc] init];
-    }
-    
-    NSValue *ptrValue = [NSValue valueWithPointer:anAlbum];
-    SPAlbum *cachedAlbum = [albumCache objectForKey:ptrValue];
-    
-    if (cachedAlbum != nil) {
-        return cachedAlbum;
-    }
-    
-    cachedAlbum = [[SPAlbum alloc] initWithAlbumStruct:anAlbum inSession:aSession];
-    
-    [albumCache setObject:cachedAlbum forKey:ptrValue];
-    return cachedAlbum;
+
+    return [[SPAlbum alloc] initWithAlbumStruct:anAlbum inSession:aSession];
 }
 
 +(void)albumWithAlbumURL:(NSURL *)aURL inSession:(SPSession *)aSession callback:(void (^)(SPAlbum *album))block {

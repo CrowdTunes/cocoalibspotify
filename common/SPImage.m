@@ -91,32 +91,10 @@ static NSMutableDictionary *imageCache;
 +(SPImage *)imageWithImageId:(const byte *)imageId inSession:(SPSession *)aSession {
     
 	SPAssertOnLibSpotifyThread();
-	
-    // Prevent image cache from growing endlessly
-    if (imageCache.count > CACHE_LIMIT) {
-        [imageCache removeAllObjects];
-        imageCache = nil;
-    }
-
-    if (imageCache == nil) {
-        imageCache = [[NSMutableDictionary alloc] init];
-    }
     
 	if (imageId == NULL) {
 		return nil;
-	}
-	
-	NSData *imageIdAsData = [NSData dataWithBytes:imageId length:SPImageIdLength];
-	SPImage *cachedImage = [imageCache objectForKey:imageIdAsData];
-	
-	if (cachedImage != nil)
-		return cachedImage;
-	
-	cachedImage = [[SPImage alloc] initWithImageStruct:NULL
-											   imageId:imageId
-											 inSession:aSession];
-	[imageCache setObject:cachedImage forKey:imageIdAsData];
-    
+	}    
 //    float cumulativeMem = 0;
 //    for (NSData* key in [imageCache allKeys]) {
 //        UIImage* image = [(SPImage*)[imageCache objectForKey:key] image];
@@ -124,7 +102,9 @@ static NSMutableDictionary *imageCache;
 //        
 //    }
 //    NSLog(@"total images: %d  estimated memory: %f MB", imageCache.count, cumulativeMem/1024.f/1024.f);
-	return cachedImage;
+    return [[SPImage alloc] initWithImageStruct:NULL
+                                        imageId:imageId
+                                      inSession:aSession];
 }
 
 +(void)imageWithImageURL:(NSURL *)imageURL inSession:(SPSession *)aSession callback:(void (^)(SPImage *image))block {

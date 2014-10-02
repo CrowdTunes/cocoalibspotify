@@ -53,27 +53,8 @@ static NSMutableDictionary *artistCache;
 +(SPArtist *)artistWithArtistStruct:(sp_artist *)anArtist inSession:(SPSession *)aSession {
     
 	SPAssertOnLibSpotifyThread();
-	
-    if (artistCache.count > CACHE_LIMIT) {
-        [artistCache removeAllObjects];
-        artistCache = nil;
-    }
     
-    if (artistCache == nil) {
-        artistCache = [[NSMutableDictionary alloc] init];
-    }
-    
-    NSValue *ptrValue = [NSValue valueWithPointer:anArtist];
-    SPArtist *cachedArtist = [artistCache objectForKey:ptrValue];
-    
-    if (cachedArtist != nil) {
-        return cachedArtist;
-    }
-    
-    cachedArtist = [[SPArtist alloc] initWithArtistStruct:anArtist inSession:aSession];
-    
-    [artistCache setObject:cachedArtist forKey:ptrValue];
-    return cachedArtist;
+    return [[SPArtist alloc] initWithArtistStruct:anArtist inSession:aSession];
 }
 
 +(void)artistWithArtistURL:(NSURL *)aURL inSession:(SPSession *)aSession callback:(void (^)(SPArtist *artist))block {

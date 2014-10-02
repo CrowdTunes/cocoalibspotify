@@ -74,10 +74,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 +(void)artistWithArtistURL:(NSURL *)aURL inSession:(SPSession *)aSession callback:(void (^)(SPArtist *artist))block;
 
-/** Clears out the Cache
- */
-+(void)clearCache;
-
 /** Initializes a new SPArtist from the given opaque sp_artist struct. 
  
  @warning This method *must* be called on the libSpotify thread. See the

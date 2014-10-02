@@ -131,10 +131,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 +(SPSession *)sharedSession;
 
-/** Clears out the Track Cache
- */
-+(void)clearCache;
-
 /** Initializes the shared SPSession object.
 
  Your application key and user agent must be valid to create an SPSession object.
