@@ -51,6 +51,8 @@
 #import "SPUnknownPlaylist.h"
 #import "SPSessionInternal.h"
 
+#define CACHE_LIMIT 100
+
 @interface NSObject (SPLoadedObject)
 -(BOOL)checkLoaded;
 @end
@@ -1184,6 +1186,16 @@ static SPSession *sharedSession;
 	
 	if (spTrack == NULL)
 		return nil;
+    
+    // keep our track cache in check
+    if (trackCache.count > CACHE_LIMIT) {
+        [trackCache removeAllObjects];
+        trackCache = nil;
+    }
+    
+    if (trackCache == nil) {
+        trackCache = [NSMutableDictionary new];
+    }
 
 	NSValue *ptrValue = [NSValue valueWithPointer:spTrack];
 	SPTrack *cachedTrack = [self.trackCache objectForKey:ptrValue];
