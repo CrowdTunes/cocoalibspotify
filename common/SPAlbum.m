@@ -64,8 +64,22 @@ static NSMutableDictionary *albumCache;
 +(SPAlbum *)albumWithAlbumStruct:(sp_album *)anAlbum inSession:(SPSession *)aSession {
     
 	SPAssertOnLibSpotifyThread();
-
-    return [[SPAlbum alloc] initWithAlbumStruct:anAlbum inSession:aSession];
+	
+    if (albumCache == nil) {
+        albumCache = [[NSMutableDictionary alloc] init];
+    }
+    
+    NSValue *ptrValue = [NSValue valueWithPointer:anAlbum];
+    SPAlbum *cachedAlbum = [albumCache objectForKey:ptrValue];
+    
+    if (cachedAlbum != nil) {
+        return cachedAlbum;
+    }
+    
+    cachedAlbum = [[SPAlbum alloc] initWithAlbumStruct:anAlbum inSession:aSession];
+    
+    [albumCache setObject:cachedAlbum forKey:ptrValue];
+    return cachedAlbum;
 }
 
 +(void)albumWithAlbumURL:(NSURL *)aURL inSession:(SPSession *)aSession callback:(void (^)(SPAlbum *album))block {
@@ -87,13 +101,6 @@ static NSMutableDictionary *albumCache;
 		}
 		if (block) dispatch_async(dispatch_get_main_queue(), ^() { block(newAlbum); });
 	});
-}
-
-+(void)clearCache {
-    SPDispatchAsync(^{
-        [albumCache removeAllObjects];
-        albumCache = [NSMutableDictionary new];
-    });
 }
 
 -(id)initWithAlbumStruct:(sp_album *)anAlbum inSession:(SPSession *)aSession {

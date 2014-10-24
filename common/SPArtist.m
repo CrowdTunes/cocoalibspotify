@@ -53,8 +53,22 @@ static NSMutableDictionary *artistCache;
 +(SPArtist *)artistWithArtistStruct:(sp_artist *)anArtist inSession:(SPSession *)aSession {
     
 	SPAssertOnLibSpotifyThread();
+	
+    if (artistCache == nil) {
+        artistCache = [[NSMutableDictionary alloc] init];
+    }
     
-    return [[SPArtist alloc] initWithArtistStruct:anArtist inSession:aSession];
+    NSValue *ptrValue = [NSValue valueWithPointer:anArtist];
+    SPArtist *cachedArtist = [artistCache objectForKey:ptrValue];
+    
+    if (cachedArtist != nil) {
+        return cachedArtist;
+    }
+    
+    cachedArtist = [[SPArtist alloc] initWithArtistStruct:anArtist inSession:aSession];
+    
+    [artistCache setObject:cachedArtist forKey:ptrValue];
+    return cachedArtist;
 }
 
 +(void)artistWithArtistURL:(NSURL *)aURL inSession:(SPSession *)aSession callback:(void (^)(SPArtist *artist))block {
@@ -76,13 +90,6 @@ static NSMutableDictionary *artistCache;
 		}
 		if (block) dispatch_async(dispatch_get_main_queue(), ^() { block(newArtist); });
 	});
-}
-
-+(void)clearCache {
-    SPDispatchAsync(^{
-        [artistCache removeAllObjects];
-        artistCache = [NSMutableDictionary new];
-    });
 }
 
 #pragma mark -

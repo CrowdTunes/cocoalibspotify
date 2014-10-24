@@ -34,6 +34,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #import "SPSession.h"
 #import "SPURLExtensions.h"
 
+#define IMAGE_CACHE_LIMIT (100)
+
 @interface SPImageCallbackProxy : NSObject
 // SPImageCallbackProxy is here to bridge the gap between -dealloc and the 
 // playlist callbacks being unregistered, since that's done async.
@@ -91,10 +93,31 @@ static NSMutableDictionary *imageCache;
 +(SPImage *)imageWithImageId:(const byte *)imageId inSession:(SPSession *)aSession {
     
 	SPAssertOnLibSpotifyThread();
+	
+    // Prevent image cache from growing endlessly
+    if (imageCache.count > IMAGE_CACHE_LIMIT) {
+        imageCache = nil;
+    }
+
+    if (imageCache == nil) {
+        imageCache = [[NSMutableDictionary alloc] init];
+    }
     
 	if (imageId == NULL) {
 		return nil;
-	}    
+	}
+	
+	NSData *imageIdAsData = [NSData dataWithBytes:imageId length:SPImageIdLength];
+	SPImage *cachedImage = [imageCache objectForKey:imageIdAsData];
+	
+	if (cachedImage != nil)
+		return cachedImage;
+	
+	cachedImage = [[SPImage alloc] initWithImageStruct:NULL
+											   imageId:imageId
+											 inSession:aSession];
+	[imageCache setObject:cachedImage forKey:imageIdAsData];
+    
 //    float cumulativeMem = 0;
 //    for (NSData* key in [imageCache allKeys]) {
 //        UIImage* image = [(SPImage*)[imageCache objectForKey:key] image];
@@ -102,9 +125,7 @@ static NSMutableDictionary *imageCache;
 //        
 //    }
 //    NSLog(@"total images: %d  estimated memory: %f MB", imageCache.count, cumulativeMem/1024.f/1024.f);
-    return [[SPImage alloc] initWithImageStruct:NULL
-                                        imageId:imageId
-                                      inSession:aSession];
+	return cachedImage;
 }
 
 +(void)imageWithImageURL:(NSURL *)imageURL inSession:(SPSession *)aSession callback:(void (^)(SPImage *image))block {
@@ -130,13 +151,6 @@ static NSMutableDictionary *imageCache;
 		
 		if (block) dispatch_async(dispatch_get_main_queue(), ^() { block(spImage); });
 	});
-}
-
-+(void)clearCache {
-    SPDispatchAsync(^{
-        [imageCache removeAllObjects];
-        imageCache = [NSMutableDictionary new];
-    });
 }
 
 #pragma mark -
