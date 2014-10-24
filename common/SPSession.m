@@ -51,6 +51,8 @@
 #import "SPUnknownPlaylist.h"
 #import "SPSessionInternal.h"
 
+#define CACHE_LIMIT 100
+
 @interface NSObject (SPLoadedObject)
 -(BOOL)checkLoaded;
 @end
@@ -1184,9 +1186,31 @@ static SPSession *sharedSession;
 	
 	if (spTrack == NULL)
 		return nil;
+    
+    // keep our track cache in check
+    if (trackCache.count > CACHE_LIMIT) {
+        [trackCache removeAllObjects];
+        trackCache = nil;
+    }
+    
+    if (trackCache == nil) {
+        trackCache = [NSMutableDictionary new];
+    }
 
-    return [[SPTrack alloc] initWithTrackStruct:spTrack
-                                      inSession:self];
+    NSValue *ptrValue = [NSValue valueWithPointer:spTrack];
+    SPTrack *cachedTrack = [self.trackCache objectForKey:ptrValue];
+    
+    if (cachedTrack != nil) {
+        // track may have been cached without album browse specific fields
+        [cachedTrack updateAlbumBrowseSpecificMembers];
+        return cachedTrack;
+    }
+    
+    cachedTrack = [[SPTrack alloc] initWithTrackStruct:spTrack
+                                             inSession:self];
+    
+    [self.trackCache setObject:cachedTrack forKey:ptrValue];
+    return cachedTrack;
 }
 
 -(SPUser *)userForUserStruct:(sp_user *)spUser {
